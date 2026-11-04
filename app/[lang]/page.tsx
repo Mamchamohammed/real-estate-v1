@@ -15,6 +15,6 @@ async function LocaleHomeContent({ params }: Pick<PageProps<"/[lang]">, "params"
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   await io();
-  const properties = await readProperties();
+  const properties = await readProperties({ fallbackOnInvalid: true });
   return <Home lang={lang} properties={properties} />;
 }

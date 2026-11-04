@@ -22,7 +22,7 @@ export default function Home({ lang, properties }: { lang: Locale; properties: P
           id="hero"
           className="hero container"
           style={{
-            backgroundImage: `linear-gradient(0deg,rgba(4,20,40,.48),transparent 45%),linear-gradient(90deg,rgba(6,22,41,.16),rgba(6,22,41,.02)),url(${photo(1)})`,
+            backgroundImage: `linear-gradient(0deg,rgba(1,8,18,.56),transparent 45%),linear-gradient(90deg,rgba(1,8,18,.28),rgba(1,8,18,.04)),url(${photo(1)})`,
           }}
         >
           <div className="hero-content">
@@ -96,7 +96,7 @@ export default function Home({ lang, properties }: { lang: Locale; properties: P
           id="contact"
           className="contact"
           style={{
-            backgroundImage: `linear-gradient(#0b1d35 0%,rgba(11,29,53,.88) 45%,rgba(11,29,53,.1) 80%),url(${photo(30)})`,
+            backgroundImage: `linear-gradient(#030914 0%,rgba(3,9,20,.9) 45%,rgba(3,9,20,.14) 80%),url(${photo(30)})`,
           }}
         >
           <div className="contact-inner">

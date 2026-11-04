@@ -22,7 +22,7 @@ async function PropertyContent({ params }: Pick<PageProps<"/[lang]/properties/[s
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
   await io();
-  const item = (await readProperties()).find((listing) => listing.slug === slug);
+  const item = (await readProperties({ fallbackOnInvalid: true })).find((listing) => listing.slug === slug);
   if (!item) notFound();
   const t = getMessages(lang);
   return <>

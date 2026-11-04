@@ -45,13 +45,21 @@ export function parseProperty(value: unknown): PropertyRecord {
   return property;
 }
 
-export async function readProperties(): Promise<PropertyRecord[]> {
+let lastGoodProperties: PropertyRecord[] | undefined;
+
+export async function readProperties({ fallbackOnInvalid = false }: { fallbackOnInvalid?: boolean } = {}): Promise<PropertyRecord[]> {
   try {
     const stored = JSON.parse(await readFile(dataFile, "utf8")) as unknown;
     if (!Array.isArray(stored)) throw new Error("Property store is invalid");
-    return stored.map(parseProperty);
+    const properties = stored.map(parseProperty);
+    lastGoodProperties = properties;
+    return properties;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return seedProperties;
+    if (fallbackOnInvalid && error instanceof Error && !(error as NodeJS.ErrnoException).code) {
+      console.error("Property store contains invalid JSON or property data; using the last valid listings for this request.", error);
+      return lastGoodProperties ?? seedProperties;
+    }
     throw error;
   }
 }

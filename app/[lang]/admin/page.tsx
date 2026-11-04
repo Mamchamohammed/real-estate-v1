@@ -5,7 +5,7 @@ import { isLocale } from "../../i18n";
 import AdminClient from "./admin-client";
 
 export const metadata: Metadata = {
-  title: "Property administration — Omar Immobilier",
+  title: "Property administration — Fennex",
   robots: { index: false, follow: false },
 };
 

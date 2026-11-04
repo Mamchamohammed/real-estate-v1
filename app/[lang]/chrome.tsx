@@ -7,8 +7,8 @@ import { useState } from "react";
 import { getMessages, locales, type Locale } from "../i18n";
 
 function Logo({ lang }: { lang: Locale }) {
-  return <Link href={`/${lang}#hero`} className="logo" aria-label={`Omar Immobilier — ${getMessages(lang).home}`}>
-    <Image className="logo-icon" src="/images/omar-logo.png" alt="Omar Immobilier" width={1254} height={1254} priority />
+  return <Link href={`/${lang}#hero`} className="logo" aria-label={`Fennex — ${getMessages(lang).home}`}>
+    <Image className="logo-icon" src="/images/fennex-logo.png" alt="Fennex" width={1254} height={1254} priority />
   </Link>;
 }
 
@@ -29,8 +29,8 @@ export function Header({ lang }: { lang: Locale }) {
   return <header className="header"><div className="nav-wrap">
     <Logo lang={lang} />
     <nav className={menu ? "nav open" : "nav"} aria-label={t.navigation}>
-      {[[t.home, "#hero"], [t.properties, "#property"], [t.contact, "#contact"]].map(([label, anchor]) =>
-        <Link key={anchor} href={`/${lang}${anchor}`} onClick={() => setMenu(false)}>{label}</Link>)}
+      {[[t.home, `/${lang}#hero`], [t.properties, `/${lang}#property`], [t.contact, `/${lang}#contact`], [t.admin, `/${lang}/admin`]].map(([label, href]) =>
+        <Link key={href} href={href} onClick={() => setMenu(false)}>{label}</Link>)}
     </nav>
     <div className="header-actions">
       <LanguageSwitcher lang={lang} />

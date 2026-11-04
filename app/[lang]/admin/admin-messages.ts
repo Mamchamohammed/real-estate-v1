@@ -4,7 +4,7 @@ export const adminMessages: Record<Locale, Record<string, string>> = {
   en: {
     panel: "Admin panel", title: "Manage properties", subtitle: "Add, edit, and remove listings shown on the website.",
     viewSite: "View website", signOut: "Sign out", signIn: "Sign in", password: "Admin password",
-    loginIntro: "Enter your admin password to manage properties.", setup: "Admin access is not configured on this server.",
+    loginIntro: "Enter your admin password to manage properties.", setup: "Admin access is not configured on this server.", localPassword: "Local development password",
     loginError: "Could not sign in. Check the password and try again.", loadError: "Could not load properties.",
     propertyCount: "Properties", add: "Add property", edit: "Edit", delete: "Delete", view: "View",
     confirmDelete: "Delete this property?", confirm: "Yes, delete", cancel: "Cancel",
@@ -20,7 +20,7 @@ export const adminMessages: Record<Locale, Record<string, string>> = {
   fr: {
     panel: "Administration", title: "Gérer les biens", subtitle: "Ajoutez, modifiez ou supprimez les annonces du site.",
     viewSite: "Voir le site", signOut: "Se déconnecter", signIn: "Se connecter", password: "Mot de passe administrateur",
-    loginIntro: "Saisissez votre mot de passe pour gérer les biens.", setup: "L’accès administrateur n’est pas configuré sur ce serveur.",
+    loginIntro: "Saisissez votre mot de passe pour gérer les biens.", setup: "L’accès administrateur n’est pas configuré sur ce serveur.", localPassword: "Mot de passe local",
     loginError: "Connexion impossible. Vérifiez le mot de passe et réessayez.", loadError: "Impossible de charger les biens.",
     propertyCount: "Biens", add: "Ajouter un bien", edit: "Modifier", delete: "Supprimer", view: "Voir",
     confirmDelete: "Supprimer ce bien ?", confirm: "Oui, supprimer", cancel: "Annuler",
@@ -36,7 +36,7 @@ export const adminMessages: Record<Locale, Record<string, string>> = {
   ar: {
     panel: "لوحة الإدارة", title: "إدارة العقارات", subtitle: "أضف العقارات المعروضة على الموقع أو عدّلها أو احذفها.",
     viewSite: "عرض الموقع", signOut: "تسجيل الخروج", signIn: "تسجيل الدخول", password: "كلمة مرور المسؤول",
-    loginIntro: "أدخل كلمة مرور المسؤول لإدارة العقارات.", setup: "لم تُضبط بيانات دخول المسؤول على هذا الخادم.",
+    loginIntro: "أدخل كلمة مرور المسؤول لإدارة العقارات.", setup: "لم تُضبط بيانات دخول المسؤول على هذا الخادم.", localPassword: "كلمة المرور المحلية",
     loginError: "تعذّر تسجيل الدخول. تحقق من كلمة المرور وأعد المحاولة.", loadError: "تعذّر تحميل العقارات.",
     propertyCount: "العقارات", add: "إضافة عقار", edit: "تعديل", delete: "حذف", view: "عرض",
     confirmDelete: "هل تريد حذف هذا العقار؟", confirm: "نعم، احذف", cancel: "إلغاء",

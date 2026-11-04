@@ -20,6 +20,7 @@ export default function AdminClient({ lang }: { lang: Locale }) {
   const t = adminMessages[lang];
   const [mode, setMode] = useState<Mode>("checking");
   const [password, setPassword] = useState("");
+  const [developmentPassword, setDevelopmentPassword] = useState<string | null>(null);
   const [properties, setProperties] = useState<PropertyRecord[]>([]);
   const [draft, setDraft] = useState<PropertyRecord | null>(null);
   const [editSlug, setEditSlug] = useState<string | null>(null);
@@ -35,6 +36,8 @@ export default function AdminClient({ lang }: { lang: Locale }) {
         const session = await fetch("/api/admin/session", { cache: "no-store" });
         const data = await session.json();
         if (!active) return;
+        setDevelopmentPassword(data.developmentPassword);
+        if (data.developmentPassword) setPassword(data.developmentPassword);
         if (!data.configured) { setMode("setup"); return; }
         if (!data.authenticated) { setMode("login"); return; }
         const response = await fetch("/api/admin/properties", { cache: "no-store" });
@@ -73,7 +76,7 @@ export default function AdminClient({ lang }: { lang: Locale }) {
 
   async function signOut() {
     await fetch("/api/admin/session", { method: "DELETE" });
-    setProperties([]); setDraft(null); setMode("login"); setNotice("");
+    setProperties([]); setDraft(null); setMode("login"); setNotice(""); setPassword(developmentPassword ?? "");
   }
 
   function updateDraft<K extends keyof PropertyRecord>(key: K, value: PropertyRecord[K]) {
@@ -111,7 +114,7 @@ export default function AdminClient({ lang }: { lang: Locale }) {
 
   return <div className="admin-shell">
     <header className="admin-header"><div className="admin-header-inner">
-      <Link href={`/${lang}`} aria-label="Omar Immobilier"><Image src="/images/omar-logo.png" alt="Omar Immobilier" width={1254} height={1254} priority /></Link>
+      <Link href={`/${lang}`} aria-label="Fennex"><Image src="/images/fennex-logo.png" alt="Fennex" width={1254} height={1254} priority /></Link>
       <div className="admin-header-actions"><LanguageSwitcher lang={lang} /><Link href={`/${lang}`}>{t.viewSite}</Link>{mode === "ready" && <button onClick={signOut}>{t.signOut}</button>}</div>
     </div></header>
     <main className="admin-main">
@@ -119,6 +122,7 @@ export default function AdminClient({ lang }: { lang: Locale }) {
       {mode === "setup" && <div className="admin-card admin-login"><span className="admin-eyebrow">{t.panel}</span><h1>{t.title}</h1><p>{t.setup}</p></div>}
       {mode === "login" && <div className="admin-card admin-login">
         <span className="admin-eyebrow">{t.panel}</span><h1>{t.title}</h1><p>{t.loginIntro}</p>
+        {developmentPassword && <p className="admin-dev-password">{t.localPassword}: <code>{developmentPassword}</code></p>}
         <form onSubmit={signIn}><label>{t.password}<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required /></label><button type="submit" disabled={busy}>{t.signIn}</button></form>
       </div>}
       {mode === "ready" && <>
