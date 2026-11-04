@@ -7,9 +7,8 @@ import { useState } from "react";
 import { getMessages, locales, type Locale } from "../i18n";
 
 function Logo({ lang }: { lang: Locale }) {
-  return <Link href={`/${lang}#hero`} className="logo" aria-label={`VistaHaven — ${getMessages(lang).home}`}>
-    <Image className="logo-icon" src="/images/ref-00.png" alt="" width={1200} height={800} />
-    <span>VISTAHAVEN</span>
+  return <Link href={`/${lang}#hero`} className="logo" aria-label={`Omar Immobilier — ${getMessages(lang).home}`}>
+    <Image className="logo-icon" src="/images/omar-logo.png" alt="Omar Immobilier" width={1254} height={1254} priority />
   </Link>;
 }
 

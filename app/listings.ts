@@ -1,13 +1,18 @@
 import type { Locale } from "./i18n";
 
 export const listings = [
-  { slug: "the-one", name: "The One", place: "Bel Air, LA", type: "investment", beds: 6, baths: 4, area: 2780, price: "$690,000", image: 1 },
-  { slug: "billionaire-mansion", name: "Billionaire Mansion", place: "Bel Air, LA", type: "sale", beds: 5, baths: 4, area: 3800, price: "$500,000", image: 6 },
-  { slug: "the-beverly-house", name: "The Beverly House", place: "Beverly Hills, CA", type: "rent", beds: 3, baths: 2, area: 1500, price: "$290,000", image: 7 },
-  { slug: "palazzo-di-amore", name: "Palazzo di Amore", place: "Beverly Hills, CA", type: "rent", beds: 4, baths: 2, area: 2100, price: "$490,000", image: 8 },
-  { slug: "the-manor", name: "The Manor", place: "Holmby Hills, LA", type: "investment", beds: 7, baths: 5, area: 3100, price: "$482,000", image: 6 },
-  { slug: "the-penthouse-at-central-park-tower", name: "The Penthouse at Central Park Tower", place: "Upper East Side, NY", type: "sale", beds: 2, baths: 2, area: 2200, price: "$298,000", image: 1 },
+  { slug: "the-one", name: "The One", place: "Bel Air, LA", type: "investment", beds: 6, baths: 4, area: 2780, priceDzd: 93647000, image: 1 },
+  { slug: "billionaire-mansion", name: "Billionaire Mansion", place: "Bel Air, LA", type: "sale", beds: 5, baths: 4, area: 3800, priceDzd: 67860000, image: 6 },
+  { slug: "the-beverly-house", name: "The Beverly House", place: "Beverly Hills, CA", type: "rent", beds: 3, baths: 2, area: 1500, priceDzd: 39359000, image: 7 },
+  { slug: "palazzo-di-amore", name: "Palazzo di Amore", place: "Beverly Hills, CA", type: "rent", beds: 4, baths: 2, area: 2100, priceDzd: 66503000, image: 8 },
+  { slug: "the-manor", name: "The Manor", place: "Holmby Hills, LA", type: "investment", beds: 7, baths: 5, area: 3100, priceDzd: 65417000, image: 6 },
+  { slug: "the-penthouse-at-central-park-tower", name: "The Penthouse at Central Park Tower", place: "Upper East Side, NY", type: "sale", beds: 2, baths: 2, area: 2200, priceDzd: 40445000, image: 1 },
 ] as const;
+
+// Illustrative prices: USD amounts converted at about 135.72 DZD per USD
+// (Bank of Algeria, 3 November 2026) and rounded to the nearest 1,000 DZD.
+export const formatDzd = (amount: number) =>
+  `${new Intl.NumberFormat("fr-DZ", { maximumFractionDigits: 0 }).format(amount)} DZD`;
 
 export const descriptions: Record<Locale, Record<(typeof listings)[number]["slug"], string>> = {
   en: {
@@ -54,10 +59,40 @@ const arabicPlaces: Record<(typeof listings)[number]["place"], string> = {
   "Upper East Side, NY": "أبر إيست سايد، نيويورك",
 };
 
-export function listingName(item: (typeof listings)[number], lang: Locale) {
-  return lang === "ar" ? arabicNames[item.slug] : item.name;
+export type PropertyType = "investment" | "sale" | "rent";
+
+export type PropertyRecord = {
+  slug: string;
+  name: string;
+  nameAr: string;
+  place: string;
+  placeAr: string;
+  type: PropertyType;
+  beds: number;
+  baths: number;
+  area: number;
+  priceDzd: number;
+  image: number;
+  descriptions: Record<Locale, string>;
+};
+
+export const availableImages = [1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30] as const;
+
+export const seedProperties: PropertyRecord[] = listings.map((item) => ({
+  ...item,
+  nameAr: arabicNames[item.slug],
+  placeAr: arabicPlaces[item.place],
+  descriptions: {
+    en: descriptions.en[item.slug],
+    fr: descriptions.fr[item.slug],
+    ar: descriptions.ar[item.slug],
+  },
+}));
+
+export function listingName(item: PropertyRecord, lang: Locale) {
+  return lang === "ar" ? item.nameAr : item.name;
 }
 
-export function listingPlace(item: (typeof listings)[number], lang: Locale) {
-  return lang === "ar" ? arabicPlaces[item.place] : item.place;
+export function listingPlace(item: PropertyRecord, lang: Locale) {
+  return lang === "ar" ? item.placeAr : item.place;
 }

@@ -5,24 +5,24 @@ import Link from "next/link";
 import { useState } from "react";
 import { Footer, Header } from "./chrome";
 import { getMessages, type Locale } from "../i18n";
-import { listingName, listingPlace, listings, photo } from "../listings";
+import { formatDzd, listingName, listingPlace, photo, type PropertyRecord } from "../listings";
 
 function Tag({ children }: { children: React.ReactNode }) {
   return <span className="tag">{children}</span>;
 }
 
-export default function Home({ lang }: { lang: Locale }) {
+export default function Home({ lang, properties }: { lang: Locale; properties: PropertyRecord[] }) {
   const t = getMessages(lang);
   const [sent, setSent] = useState(false);
   return (
     <>
       <Header lang={lang} />
-      <main>
+      <main className="home-main">
         <section
           id="hero"
           className="hero container"
           style={{
-            backgroundImage: `linear-gradient(90deg,rgba(6,22,41,.16),rgba(6,22,41,.02)),url(${photo(1)})`,
+            backgroundImage: `linear-gradient(0deg,rgba(4,20,40,.48),transparent 45%),linear-gradient(90deg,rgba(6,22,41,.16),rgba(6,22,41,.02)),url(${photo(1)})`,
           }}
         >
           <div className="hero-content">
@@ -47,7 +47,7 @@ export default function Home({ lang }: { lang: Locale }) {
               </div>
               <div>
                 <strong dir="ltr">
-                  $10M<sup>+</sup>
+                  1.36B DZD<sup>+</sup>
                 </strong>
                 <small>{t.value}</small>
               </div>
@@ -62,7 +62,7 @@ export default function Home({ lang }: { lang: Locale }) {
           </h2>
           <p className="image-note">{t.photoNote}</p>
           <div className="property-grid">
-            {listings.map((item) => (
+            {properties.map((item) => (
               <Link
                 className="property"
                 key={item.slug}
@@ -87,7 +87,7 @@ export default function Home({ lang }: { lang: Locale }) {
                     ↔ {item.area.toLocaleString(lang)} {t.area}
                   </span>
                 </div>
-                <strong dir="ltr">{item.price}</strong>
+                <strong dir="ltr">{formatDzd(item.priceDzd)}</strong>
               </Link>
             ))}
           </div>
@@ -96,7 +96,7 @@ export default function Home({ lang }: { lang: Locale }) {
           id="contact"
           className="contact"
           style={{
-            backgroundImage: `linear-gradient(#6e9ac2 0%,rgba(111,157,195,.85) 45%,rgba(111,157,195,0) 80%),url(${photo(30)})`,
+            backgroundImage: `linear-gradient(#0b1d35 0%,rgba(11,29,53,.88) 45%,rgba(11,29,53,.1) 80%),url(${photo(30)})`,
           }}
         >
           <div className="contact-inner">
