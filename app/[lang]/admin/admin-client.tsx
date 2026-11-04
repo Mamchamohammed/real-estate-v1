@@ -21,6 +21,7 @@ export default function AdminClient({ lang }: { lang: Locale }) {
   const [mode, setMode] = useState<Mode>("checking");
   const [password, setPassword] = useState("");
   const [developmentPassword, setDevelopmentPassword] = useState<string | null>(null);
+  const [setupMessage, setSetupMessage] = useState("");
   const [properties, setProperties] = useState<PropertyRecord[]>([]);
   const [draft, setDraft] = useState<PropertyRecord | null>(null);
   const [editSlug, setEditSlug] = useState<string | null>(null);
@@ -38,7 +39,10 @@ export default function AdminClient({ lang }: { lang: Locale }) {
         if (!active) return;
         setDevelopmentPassword(data.developmentPassword);
         if (data.developmentPassword) setPassword(data.developmentPassword);
-        if (!data.configured) { setMode("setup"); return; }
+        if (!data.configured || !data.storageConfigured) {
+          setSetupMessage(!data.configured ? `${t.authSetup}${!data.storageConfigured ? ` ${t.storageSetup}` : ""}` : t.storageSetup);
+          setMode("setup"); return;
+        }
         if (!data.authenticated) { setMode("login"); return; }
         const response = await fetch("/api/admin/properties", { cache: "no-store" });
         if (!response.ok) throw new Error();
@@ -50,7 +54,7 @@ export default function AdminClient({ lang }: { lang: Locale }) {
     }
     void initialize();
     return () => { active = false; };
-  }, [t.loadError]);
+  }, [t.authSetup, t.loadError, t.storageSetup]);
 
   async function refreshProperties() {
     const response = await fetch("/api/admin/properties", { cache: "no-store" });
@@ -119,7 +123,7 @@ export default function AdminClient({ lang }: { lang: Locale }) {
     </div></header>
     <main className="admin-main">
       {mode === "checking" && <div className="admin-card admin-loading" />}
-      {mode === "setup" && <div className="admin-card admin-login"><span className="admin-eyebrow">{t.panel}</span><h1>{t.title}</h1><p>{t.setup}</p></div>}
+      {mode === "setup" && <div className="admin-card admin-login"><span className="admin-eyebrow">{t.panel}</span><h1>{t.title}</h1><p>{setupMessage}</p></div>}
       {mode === "login" && <div className="admin-card admin-login">
         <span className="admin-eyebrow">{t.panel}</span><h1>{t.title}</h1><p>{t.loginIntro}</p>
         {developmentPassword && <p className="admin-dev-password">{t.localPassword}: <code>{developmentPassword}</code></p>}

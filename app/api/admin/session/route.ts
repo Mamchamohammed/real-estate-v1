@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminConfigured, adminCookie, createSession, developmentAdminPassword, isAdmin, passwordMatches, sameOrigin, sessionSeconds } from "../../../admin-auth";
+import { storageConfigured } from "../../../property-store";
 
 const noStore = { "Cache-Control": "no-store" };
 
 export function GET(request: NextRequest) {
-  return NextResponse.json({ configured: adminConfigured(), authenticated: isAdmin(request), developmentPassword: developmentAdminPassword() }, { headers: noStore });
+  return NextResponse.json({ configured: adminConfigured(), storageConfigured: storageConfigured(), authenticated: isAdmin(request), developmentPassword: developmentAdminPassword() }, { headers: noStore });
 }
 
 export async function POST(request: NextRequest) {

@@ -1,10 +1,61 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { neon } from "@neondatabase/serverless";
 import { availableImages, seedProperties, type PropertyRecord, type PropertyType } from "./listings";
 
 const dataDirectory = join(process.cwd(), "data");
 const dataFile = join(dataDirectory, "properties.json");
+const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+const sql = databaseUrl ? neon(databaseUrl) : null;
+const hostedWithoutDatabase = Boolean(process.env.VERCEL && !sql);
+let initialization: Promise<void> | undefined;
+
+export const storageConfigured = () => !hostedWithoutDatabase;
+
+function ensureDatabase() {
+  if (!sql) throw new Error("Database is not configured");
+  initialization ??= (async () => {
+    await sql`CREATE TABLE IF NOT EXISTS fennex_property_store (
+      id integer PRIMARY KEY,
+      properties jsonb NOT NULL,
+      version bigint NOT NULL DEFAULT 0
+    )`;
+    await sql`INSERT INTO fennex_property_store (id, properties)
+      VALUES (1, ${JSON.stringify(seedProperties)}::jsonb)
+      ON CONFLICT (id) DO NOTHING`;
+  })().catch((error) => {
+    initialization = undefined;
+    throw error;
+  });
+  return initialization;
+}
+
+async function readDatabase() {
+  if (!sql) throw new Error("Database is not configured");
+  await ensureDatabase();
+  const rows = await sql`SELECT properties, version FROM fennex_property_store WHERE id = 1`;
+  const row = rows[0];
+  const stored: unknown = typeof row?.properties === "string" ? JSON.parse(row.properties) : row?.properties;
+  if (!Array.isArray(stored)) throw new Error("Property store is invalid");
+  return { properties: stored.map(parseProperty), version: String(row.version) };
+}
+
+async function updateDatabase<T>(change: (properties: PropertyRecord[]) => T | Promise<T>): Promise<T> {
+  if (!sql) throw new Error("Database is not configured");
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { properties, version } = await readDatabase();
+    const result = await change(properties);
+    const updated = await sql`UPDATE fennex_property_store
+      SET properties = ${JSON.stringify(properties)}::jsonb, version = version + 1
+      WHERE id = 1 AND version = ${version}::bigint RETURNING version`;
+    if (updated.length) {
+      lastGoodProperties = properties;
+      return result;
+    }
+  }
+  throw new Error("Property store changed during update; please retry");
+}
 
 const textField = (value: unknown, max: number) =>
   typeof value === "string" ? value.trim().slice(0, max + 1) : "";
@@ -47,15 +98,44 @@ export function parseProperty(value: unknown): PropertyRecord {
 
 let lastGoodProperties: PropertyRecord[] | undefined;
 
+async function readStoreText() {
+  try {
+    return await readFile(dataFile, "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    await mkdir(dataDirectory, { recursive: true });
+    try {
+      await writeFile(dataFile, `${JSON.stringify(seedProperties, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
+    } catch (createError) {
+      if ((createError as NodeJS.ErrnoException).code !== "EEXIST") throw createError;
+    }
+    return readFile(dataFile, "utf8");
+  }
+}
+
 export async function readProperties({ fallbackOnInvalid = false }: { fallbackOnInvalid?: boolean } = {}): Promise<PropertyRecord[]> {
   try {
-    const stored = JSON.parse(await readFile(dataFile, "utf8")) as unknown;
+    if (hostedWithoutDatabase) throw new Error("DATABASE_URL is required for property storage on Vercel");
+    if (sql) {
+      const { properties } = await readDatabase();
+      lastGoodProperties = properties;
+      return properties;
+    }
+    const stored = JSON.parse(await readStoreText()) as unknown;
     if (!Array.isArray(stored)) throw new Error("Property store is invalid");
     const properties = stored.map(parseProperty);
     lastGoodProperties = properties;
     return properties;
   } catch (error) {
+    if (fallbackOnInvalid && (sql || hostedWithoutDatabase)) {
+      console.error("Could not load database properties; showing the last valid listings.", error);
+      return lastGoodProperties ?? seedProperties;
+    }
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return seedProperties;
+    if (fallbackOnInvalid && ["EACCES", "EPERM", "EROFS"].includes((error as NodeJS.ErrnoException).code ?? "")) {
+      console.error("Property store is not writable on this server; showing the last valid listings.", error);
+      return lastGoodProperties ?? seedProperties;
+    }
     if (fallbackOnInvalid && error instanceof Error && !(error as NodeJS.ErrnoException).code) {
       console.error("Property store contains invalid JSON or property data; using the last valid listings for this request.", error);
       return lastGoodProperties ?? seedProperties;
@@ -67,6 +147,8 @@ export async function readProperties({ fallbackOnInvalid = false }: { fallbackOn
 let writeQueue: Promise<void> = Promise.resolve();
 
 export function updateProperties<T>(change: (properties: PropertyRecord[]) => T | Promise<T>): Promise<T> {
+  if (hostedWithoutDatabase) return Promise.reject(new Error("DATABASE_URL is required for property storage on Vercel"));
+  if (sql) return updateDatabase(change);
   const operation = writeQueue.then(async () => {
     const properties = await readProperties();
     const result = await change(properties);
