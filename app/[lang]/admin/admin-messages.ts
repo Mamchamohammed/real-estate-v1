@@ -2,11 +2,8 @@ import type { Locale } from "../../i18n";
 
 export const adminMessages: Record<Locale, Record<string, string>> = {
   en: {
-    authSetup: "Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET in your Vercel project settings, then redeploy.",
     panel: "Admin panel", title: "Manage properties", subtitle: "Add, edit, and remove listings shown on the website.",
-    viewSite: "View website", signOut: "Sign out", signIn: "Sign in", password: "Admin password",
-    loginIntro: "Enter your admin password to manage properties.", setup: "Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET in your Vercel project settings, then redeploy.", storageSetup: "Connect a Neon Postgres database to this Vercel project so DATABASE_URL is available, then redeploy.", localPassword: "Local development password",
-    loginError: "Could not sign in. Check the password and try again.", loadError: "Could not load properties.",
+    viewSite: "View website",
     propertyCount: "Properties", add: "Add property", edit: "Edit", delete: "Delete", view: "View",
     confirmDelete: "Delete this property?", confirm: "Yes, delete", cancel: "Cancel",
     createTitle: "New property", editTitle: "Edit property", save: "Save property", saving: "Saving…",
@@ -19,12 +16,8 @@ export const adminMessages: Record<Locale, Record<string, string>> = {
     empty: "No properties yet. Add the first one.", imageHint: "Choose from the current photo library.",
   },
   fr: {
-    authSetup: "Definissez ADMIN_PASSWORD et ADMIN_SESSION_SECRET dans les parametres du projet Vercel, puis redeployez.",
-    storageSetup: "Connectez une base Neon Postgres au projet Vercel pour fournir DATABASE_URL, puis redeployez.",
     panel: "Administration", title: "Gérer les biens", subtitle: "Ajoutez, modifiez ou supprimez les annonces du site.",
-    viewSite: "Voir le site", signOut: "Se déconnecter", signIn: "Se connecter", password: "Mot de passe administrateur",
-    loginIntro: "Saisissez votre mot de passe pour gérer les biens.", setup: "L’accès administrateur n’est pas configuré sur ce serveur.", localPassword: "Mot de passe local",
-    loginError: "Connexion impossible. Vérifiez le mot de passe et réessayez.", loadError: "Impossible de charger les biens.",
+    viewSite: "Voir le site",
     propertyCount: "Biens", add: "Ajouter un bien", edit: "Modifier", delete: "Supprimer", view: "Voir",
     confirmDelete: "Supprimer ce bien ?", confirm: "Oui, supprimer", cancel: "Annuler",
     createTitle: "Nouveau bien", editTitle: "Modifier le bien", save: "Enregistrer le bien", saving: "Enregistrement…",
@@ -37,12 +30,8 @@ export const adminMessages: Record<Locale, Record<string, string>> = {
     empty: "Aucun bien pour le moment. Ajoutez le premier.", imageHint: "Choisissez une photo de la bibliothèque actuelle.",
   },
   ar: {
-    authSetup: "عيّن ADMIN_PASSWORD و ADMIN_SESSION_SECRET في إعدادات مشروع Vercel، ثم أعد النشر.",
-    storageSetup: "اربط قاعدة بيانات Neon Postgres بمشروع Vercel لتوفير DATABASE_URL، ثم أعد النشر.",
     panel: "لوحة الإدارة", title: "إدارة العقارات", subtitle: "أضف العقارات المعروضة على الموقع أو عدّلها أو احذفها.",
-    viewSite: "عرض الموقع", signOut: "تسجيل الخروج", signIn: "تسجيل الدخول", password: "كلمة مرور المسؤول",
-    loginIntro: "أدخل كلمة مرور المسؤول لإدارة العقارات.", setup: "لم تُضبط بيانات دخول المسؤول على هذا الخادم.", localPassword: "كلمة المرور المحلية",
-    loginError: "تعذّر تسجيل الدخول. تحقق من كلمة المرور وأعد المحاولة.", loadError: "تعذّر تحميل العقارات.",
+    viewSite: "عرض الموقع",
     propertyCount: "العقارات", add: "إضافة عقار", edit: "تعديل", delete: "حذف", view: "عرض",
     confirmDelete: "هل تريد حذف هذا العقار؟", confirm: "نعم، احذف", cancel: "إلغاء",
     createTitle: "عقار جديد", editTitle: "تعديل العقار", save: "حفظ العقار", saving: "جارٍ الحفظ…",

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { Footer, Header } from "./chrome";
 import { getMessages, type Locale } from "../i18n";
-import { formatDzd, listingName, listingPlace, photo, type PropertyRecord, type PropertyType } from "../listings";
+import { formatDzd, listingName, listingPlace, photo, type PropertyType } from "../listings";
+import { useProperties } from "../property-local-store";
 
 type PropertyFilter = PropertyType | "all";
 const propertyTypes: PropertyType[] = ["sale", "rent", "investment"];
@@ -14,8 +15,9 @@ function Tag({ children }: { children: React.ReactNode }) {
   return <span className="tag">{children}</span>;
 }
 
-export default function Home({ lang, properties }: { lang: Locale; properties: PropertyRecord[] }) {
+export default function Home({ lang }: { lang: Locale }) {
   const t = getMessages(lang);
+  const properties = useProperties();
   const [sent, setSent] = useState(false);
   const [query, setQuery] = useState("");
   const [propertyFilter, setPropertyFilter] = useState<PropertyFilter>("all");
