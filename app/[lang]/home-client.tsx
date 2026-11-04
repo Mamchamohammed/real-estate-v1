@@ -5,7 +5,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { Footer, Header } from "./chrome";
 import { getMessages, type Locale } from "../i18n";
-import { formatDzd, listingName, listingPlace, photo, type PropertyRecord } from "../listings";
+import { formatDzd, listingName, listingPlace, photo, type PropertyRecord, type PropertyType } from "../listings";
+
+type PropertyFilter = PropertyType | "all";
+const propertyTypes: PropertyType[] = ["sale", "rent", "investment"];
 
 function Tag({ children }: { children: React.ReactNode }) {
   return <span className="tag">{children}</span>;
@@ -14,6 +17,12 @@ function Tag({ children }: { children: React.ReactNode }) {
 export default function Home({ lang, properties }: { lang: Locale; properties: PropertyRecord[] }) {
   const t = getMessages(lang);
   const [sent, setSent] = useState(false);
+  const [query, setQuery] = useState("");
+  const [propertyFilter, setPropertyFilter] = useState<PropertyFilter>("all");
+  const search = query.trim().toLocaleLowerCase(lang);
+  const filteredProperties = properties.filter((item) =>
+    (propertyFilter === "all" || item.type === propertyFilter) &&
+    (!search || `${listingName(item, lang)} ${listingPlace(item, lang)}`.toLocaleLowerCase(lang).includes(search)));
   return (
     <>
       <Header lang={lang} />
@@ -61,8 +70,19 @@ export default function Home({ lang, properties }: { lang: Locale; properties: P
             <br className="desktop" /> {t.featuredLines[1]}
           </h2>
           <p className="image-note">{t.photoNote}</p>
+          <div className="property-filters">
+            <label className="sr-only" htmlFor="property-search">{t.searchProperties}</label>
+            <input id="property-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.searchProperties} />
+            <div className="property-type-filters" role="group" aria-label={t.filterByType}>
+              {(["all", ...propertyTypes] as PropertyFilter[]).map((type) =>
+                <button key={type} type="button" aria-pressed={propertyFilter === type} onClick={() => setPropertyFilter(type)}>
+                  {type === "all" ? t.allTypes : t.types[type]}
+                </button>)}
+            </div>
+          </div>
+          <p className="property-results" role="status">{filteredProperties.length} {t.results}</p>
           <div className="property-grid">
-            {properties.map((item) => (
+            {filteredProperties.map((item) => (
               <Link
                 className="property"
                 key={item.slug}
@@ -74,23 +94,24 @@ export default function Home({ lang, properties }: { lang: Locale; properties: P
                     alt={`${t.exterior} ${listingName(item, lang)}`}
                     width={1200}
                     height={800}
-                    sizes="(max-width: 440px) 100vw, (max-width: 700px) 50vw, 33vw"
+                    sizes="(max-width: 700px) 40vw, 280px"
                   />
                   <span>{t.types[item.type]}</span>
                 </div>
-                <p className="place">● &nbsp;{listingPlace(item, lang)}</p>
-                <h3>{listingName(item, lang)}</h3>
-                <div className="facts">
-                  <span>▱ {item.beds}</span>
-                  <span>♧ {item.baths}</span>
-                  <span>
-                    ↔ {item.area.toLocaleString(lang)} {t.area}
-                  </span>
+                <div className="property-content">
+                  <p className="place">● &nbsp;{listingPlace(item, lang)}</p>
+                  <h3>{listingName(item, lang)}</h3>
+                  <div className="facts">
+                    <span>▱ {item.beds}</span>
+                    <span>♧ {item.baths}</span>
+                    <span>↔ {item.area.toLocaleString(lang)} {t.area}</span>
+                  </div>
+                  <strong dir="ltr">{formatDzd(item.priceDzd)}</strong>
                 </div>
-                <strong dir="ltr">{formatDzd(item.priceDzd)}</strong>
               </Link>
             ))}
           </div>
+          {filteredProperties.length === 0 && <p className="property-empty">{t.noResults}</p>}
         </section>
         <section
           id="contact"

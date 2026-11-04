@@ -4,16 +4,15 @@ import { adminConfigured, adminCookie, createSession, developmentAdminPassword, 
 const noStore = { "Cache-Control": "no-store" };
 
 export function GET(request: NextRequest) {
-  const hostname = request.nextUrl.hostname;
-  return NextResponse.json({ configured: adminConfigured(hostname), authenticated: isAdmin(request), developmentPassword: developmentAdminPassword(hostname) }, { headers: noStore });
+  return NextResponse.json({ configured: adminConfigured(), authenticated: isAdmin(request), developmentPassword: developmentAdminPassword() }, { headers: noStore });
 }
 
 export async function POST(request: NextRequest) {
   if (!sameOrigin(request)) return NextResponse.json({ error: "Invalid origin" }, { status: 403, headers: noStore });
-  if (!adminConfigured(request.nextUrl.hostname)) return NextResponse.json({ error: "Admin is not configured" }, { status: 503, headers: noStore });
+  if (!adminConfigured()) return NextResponse.json({ error: "Admin is not configured" }, { status: 503, headers: noStore });
   let input: unknown;
   try { input = await request.json(); } catch { return NextResponse.json({ error: "Invalid request" }, { status: 400, headers: noStore }); }
-  if (!passwordMatches((input as { password?: unknown })?.password, request.nextUrl.hostname)) {
+  if (!passwordMatches((input as { password?: unknown })?.password)) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401, headers: noStore });
   }
   const response = NextResponse.json({ authenticated: true }, { headers: noStore });

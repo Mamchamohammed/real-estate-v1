@@ -26,7 +26,7 @@ export function LanguageSwitcher({ lang }: { lang: Locale }) {
 export function Header({ lang }: { lang: Locale }) {
   const t = getMessages(lang);
   const [menu, setMenu] = useState(false);
-  return <header className="header"><div className="nav-wrap">
+  return <><header className="header"><div className="nav-wrap">
     <Logo lang={lang} />
     <nav className={menu ? "nav open" : "nav"} aria-label={t.navigation}>
       {[[t.home, `/${lang}#hero`], [t.properties, `/${lang}#property`], [t.contact, `/${lang}#contact`], [t.admin, `/${lang}/admin`]].map(([label, href]) =>
@@ -37,7 +37,12 @@ export function Header({ lang }: { lang: Locale }) {
       <Link className="nav-cta" href={`/${lang}#contact`}><span className="dot" />{t.contactNow}<span className="round-arrow">↗</span></Link>
       <button className="mobile-menu" aria-label={t.toggleMenu} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? "✕" : "☰"}</button>
     </div>
-  </div></header>;
+  </div></header>
+    <a className="whatsapp-float" href="https://wa.me/12025550147" target="_blank" rel="noopener noreferrer" aria-label={t.whatsapp} title={t.whatsapp}>
+      <svg viewBox="0 0 32 32" width="25" height="25" fill="none" aria-hidden="true"><path d="M16 3a12 12 0 0 0-10.3 18.2L4 29l7.9-2A12 12 0 1 0 16 3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/><path d="M11 10.5c.4-1 1.3-1.1 1.8-.2l1.2 2.2c.3.5.2.9-.2 1.3l-.7.7a10 10 0 0 0 4.4 4.4l.7-.7c.4-.4.8-.5 1.3-.2l2.2 1.2c.9.5.8 1.4-.2 1.8-1 .5-2.1.6-3.2.2-4.1-1.5-7.4-4.8-8.9-8.9-.4-1.1-.3-2.2.2-3.2Z" fill="currentColor"/></svg>
+      <span>{t.whatsapp}</span>
+    </a>
+  </>;
 }
 
 export function Footer({ lang }: { lang: Locale }) {

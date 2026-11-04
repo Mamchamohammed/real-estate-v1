@@ -7,19 +7,18 @@ export const sessionSeconds = 12 * 60 * 60;
 const password = process.env.ADMIN_PASSWORD;
 const secret = process.env.ADMIN_SESSION_SECRET || (process.env.NODE_ENV === "development" ? randomBytes(32).toString("hex") : undefined);
 const localPassword = "fennex123";
-const isLocalDevelopment = (hostname: string) =>
-  process.env.NODE_ENV === "development" && ["localhost", "127.0.0.1", "::1"].includes(hostname);
+const isDevelopment = () => process.env.NODE_ENV === "development";
 
-export const developmentAdminPassword = (hostname: string) =>
-  isLocalDevelopment(hostname) ? localPassword : null;
+export const developmentAdminPassword = () =>
+  isDevelopment() ? localPassword : null;
 
-export const adminConfigured = (hostname: string) =>
-  Boolean(secret && secret.length >= 32 && (password || isLocalDevelopment(hostname)));
+export const adminConfigured = () =>
+  Boolean(secret && secret.length >= 32 && (password || isDevelopment()));
 
-export function passwordMatches(candidate: unknown, hostname: string) {
-  if (!adminConfigured(hostname) || typeof candidate !== "string") return false;
+export function passwordMatches(candidate: unknown) {
+  if (!adminConfigured() || typeof candidate !== "string") return false;
   const received = createHash("sha256").update(candidate).digest();
-  return [password, developmentAdminPassword(hostname)].some((allowed) =>
+  return [password, developmentAdminPassword()].some((allowed) =>
     allowed && timingSafeEqual(received, createHash("sha256").update(allowed).digest()));
 }
 
@@ -32,8 +31,8 @@ export function createSession() {
   return `${expiresAt}.${signature(expiresAt)}`;
 }
 
-export function validSession(token: string | undefined, hostname: string) {
-  if (!adminConfigured(hostname) || !token) return false;
+export function validSession(token: string | undefined) {
+  if (!adminConfigured() || !token) return false;
   const [expiresAt, received] = token.split(".");
   if (!/^[0-9]+$/.test(expiresAt) || !received) return false;
   const expiry = Number(expiresAt);
@@ -45,9 +44,12 @@ export function validSession(token: string | undefined, hostname: string) {
 }
 
 export const isAdmin = (request: NextRequest) =>
-  validSession(request.cookies.get(adminCookie)?.value, request.nextUrl.hostname);
+  validSession(request.cookies.get(adminCookie)?.value);
 
 export function sameOrigin(request: NextRequest) {
   const origin = request.headers.get("origin");
-  return Boolean(origin && origin === new URL(request.url).origin);
+  const host = request.headers.get("host");
+  if (!origin || !host) return false;
+  const protocol = request.headers.get("x-forwarded-proto")?.split(",")[0] || request.nextUrl.protocol.slice(0, -1);
+  return origin === `${protocol}://${host}`;
 }
